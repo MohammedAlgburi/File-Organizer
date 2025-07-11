@@ -1,13 +1,15 @@
-import face_recognition
+import face_recognition as fr
 import cv2 as cv
 import numpy as np
 
-def get_face_encodings(image_path: str) -> list[np.ndarray]:
-    image = face_recognition.load_image_file(image_path)
+def process_image(image_path: str) -> tuple:
+    image = fr.load_image_file(image_path)
 
-    encodings = face_recognition.face_encodings(image)
-    print(encodings)
-    return encodings
+    face_locations = fr.face_locations(image)
 
-def show_cropped_face(coordinates: tuple):
-    pass
+    encodings = []
+
+    for face in face_locations:
+        encodings = fr.face_encodings(image, known_face_locations=face)
+    
+    return (face_locations, encodings)

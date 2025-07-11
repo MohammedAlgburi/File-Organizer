@@ -18,6 +18,8 @@ class FaceEncodingStorage:
                 EncodingWriteError: if there was an error from sqlite3 module.
         """
         for encoding in encodings:
+            if self.check_encoding(encoding):
+                continue
             try: 
                 cursor = self.conn.cursor()
                 cursor.execute("INSERT INTO encodings (name, encoding) VALUES (?, ?)", (None, encoding.tobytes()))
@@ -67,3 +69,10 @@ class FaceEncodingStorage:
             return False
         return True
 
+    def check_encoding(self, encoding: np.ndarray) -> bool:
+        cursor = self.conn.cursor()
+        cursor.execute("SELECT encoding FROM encodings WHERE encoding = ?", encoding.tobytes())
+        result = cursor.fetchone()
+        if result:
+            return True
+        return False
