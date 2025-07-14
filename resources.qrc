@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/rc">
+        <file>venv\IMG_20250602_182834737.jpg</file>
+    </qresource>
+</RCC>
+
+<!-- python compile: pyside6-rcc resources.qrc -o resources_rc.py -->

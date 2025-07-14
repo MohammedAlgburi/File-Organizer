@@ -1,5 +1,7 @@
-from face_encodings_database import FaceEncodingStorage
+from FaceEncodingStorage import FaceEncodingStorage
+from FileManager import FileManager
+from MainWindow import run_gui
+
 
 if __name__ == "__main__":
-    db = FaceEncodingStorage()
-
+    run_gui()

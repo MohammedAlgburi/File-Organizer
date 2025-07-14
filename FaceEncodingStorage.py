@@ -5,6 +5,7 @@ from exceptions import CloseDataBaseError, EncodingDBInitError, EncodingWriteErr
 class FaceEncodingStorage:
     def __init__(self) -> None:
         self.conn = sql.connect("face_encoding.db")
+
         if self.check_table_exist() == False:
             self.initialize_db()
 
@@ -12,7 +13,7 @@ class FaceEncodingStorage:
         """Adds a list of encodings into the database
         
             Args:
-                list_of_encodings (list): list of encodings which will be added to the database.
+                encodings (list): list of encodings which will be added to the database.
 
             Raises: 
                 EncodingWriteError: if there was an error from sqlite3 module.
@@ -70,6 +71,15 @@ class FaceEncodingStorage:
         return True
 
     def check_encoding(self, encoding: np.ndarray) -> bool:
+        """Checks if an encoding is in db.
+
+            Args:
+                encoding (np.ndarray): encoding which will be checked.
+
+            Returns:
+                bool: True if encoding is already in the db.
+
+        """
         cursor = self.conn.cursor()
         cursor.execute("SELECT encoding FROM encodings WHERE encoding = ?", encoding.tobytes())
         result = cursor.fetchone()
