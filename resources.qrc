@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/rc">
-        <file>venv\IMG_20250602_182834737.jpg</file>
+        <file>Resources\Picture-Select-image.png</file>
     </qresource>
 </RCC>
 
