@@ -25,7 +25,6 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         # THIS PART MIGHT GO GLOBAL IF I EVER NEED TO ACCESS IT LATER
         face_identification_screen = FaceIdentificationScreen()
-        face_identification_screen.setup_ui()
         
         self.page_manager.addWidget(face_identification_screen)
         self.page_manager.setCurrentIndex(0)
