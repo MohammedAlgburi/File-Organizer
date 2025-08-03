@@ -1,36 +1,36 @@
 import sqlite3 as sql
 import numpy as np
-from exceptions import CloseDataBaseError, EncodingDBInitError, EncodingWriteError
+from exceptions import CloseDBError, EmbeddingDBInitError, EmbeddingWriteError, ChangeEmbeddingNameError
 
-class FaceEncodingStorage:
+class FaceEmbeddingStorage:
     def __init__(self) -> None:
         self.conn = sql.connect("face_encoding.db")
 
         if self.check_table_exist() == False:
             self.initialize_db()
 
-    def add_encodings(self, encodings: list[np.ndarray]) -> None:
+    def add_encodings(self, embeddings: list[np.ndarray]) -> None:
         """Adds a list of encodings into the database
         
             Args:
-                encodings (list): list of encodings which will be added to the database.
+                embeddings (list): list of embedding which will be added to the database.
 
             Raises: 
                 EncodingWriteError: if there was an error from sqlite3 module.
         """
-        for encoding in encodings:
-            if self.check_encoding(encoding):
+        for embedding in embeddings:
+            if self.check_embedding(embedding):
                 continue
             try: 
                 cursor = self.conn.cursor()
-                cursor.execute("INSERT INTO encodings (name, encoding) VALUES (?, ?)", (None, encoding.tobytes()))
+                cursor.execute("INSERT INTO embeddings (name, embedding) VALUES (?, ?)", (None, embedding.tobytes()))
                 self.conn.commit()
                 cursor.close()
             except sql.Error:
-                raise EncodingWriteError()
+                raise EmbeddingWriteError()
         
     def initialize_db(self) -> None:
-        """Initializes the table used for storing image encodings.
+        """Initializes the table used for storing image embeddings.
         
             Raises:
                 EncodingDBInitError: if there was an sqlite3 error when initializing the database.
@@ -38,11 +38,11 @@ class FaceEncodingStorage:
         try:
             self.conn.execute("""CREATE TABLE IF NOT EXISTS encodings 
                             (name TEXT,
-                            encoding BLOB PRIMARY KEY)""")
+                            embedding BLOB PRIMARY KEY)""")
             self.conn.commit()
 
         except sql.Error:
-            raise EncodingDBInitError()
+            raise EmbeddingDBInitError()
 
 
     def close(self) -> None:
@@ -55,7 +55,7 @@ class FaceEncodingStorage:
         try:
             self.conn.close()
         except sql.Error:
-            raise CloseDataBaseError()
+            raise CloseDBError()
 
     def check_table_exist(self) -> bool:
         """Checks if db exists.
@@ -65,24 +65,34 @@ class FaceEncodingStorage:
         
         """
         cursor = self.conn.cursor()
-        db = cursor.execute("SELECT name FROM sqlite_master WHERE name = 'encodings'")
+        db = cursor.execute("SELECT name FROM sqlite_master WHERE name = 'embeddings'")
         if db.fetchone() is None:
             return False
         return True
 
-    def check_encoding(self, encoding: np.ndarray) -> bool:
+    def check_embedding(self, embedding: np.ndarray) -> bool:
         """Checks if an encoding is in db.
 
             Args:
-                encoding (np.ndarray): encoding which will be checked.
+                embedding (np.ndarray): embedding which will be checked.
 
             Returns:
-                bool: True if encoding is already in the db.
+                bool: True if embedding is already in the db.
 
         """
         cursor = self.conn.cursor()
-        cursor.execute("SELECT encoding FROM encodings WHERE encoding = ?", encoding.tobytes())
+        cursor.execute("SELECT embedding FROM embeddings WHERE embedding = ?", embedding.tobytes())
         result = cursor.fetchone()
         if result:
             return True
         return False
+    
+    def change_embedding_name(self, embedding: np.ndarray, name: str) -> None:
+        try:
+            cursor = self.conn.cursor()
+
+            cursor.execute("UPDATE embeddings SET name = ? WHERE embedding = ?", (name, embedding))
+            self.conn.commit()
+
+        except sql.Error:
+            raise ChangeEmbeddingNameError()
