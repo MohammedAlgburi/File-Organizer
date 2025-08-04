@@ -6,10 +6,18 @@ from FaceIdentificationScreen import FaceIdentificationScreen
 class App:
     def __init__(self) -> None:
         self.app = QtWidgets.QApplication([])
+        
         self.main_window = MainWindow()
         self.main_window.show()
 
+        style_sheet = self.load_style_sheet("Styles.qss")
+        self.app.setStyleSheet(style_sheet)
+
         sys.exit(self.app.exec())
+    
+    def load_style_sheet(self, path):
+        with open(path) as file:
+            return file.read()
 
 class MainWindow(QMainWindow):
     def __init__(self):

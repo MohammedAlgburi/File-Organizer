@@ -1,0 +1,35 @@
+QPushButton {
+
+}
+
+QMainWindow {
+    background-color: #000000;
+    border-radius: 3px
+}
+
+#face {
+    background-color: #0C1821;
+}
+
+#Panel {
+    background-color: #0C1821;
+    border-color: #0C1821;
+    border-radius: 4px;
+}
+
+#Panel QPushButton {
+    background-color: #1B2A41;
+    border-radius: 4px;
+}
+
+#Panel QPushButton:Hover {
+    background-color: #324A5F;
+    border-radius: 4px;
+}
+
+#DisplayArea {
+    background-color: #0C1821;
+    color: #CCC9DC;
+}
+
+

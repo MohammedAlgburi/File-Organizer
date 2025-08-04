@@ -1,14 +1,11 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QStackedWidget, QScrollArea, QPushButton, QTextEdit, QSpacerItem, QSizePolicy
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QStackedWidget, QScrollArea, QPushButton, QTextEdit, QSpacerItem
 from PySide6.QtGui import QPixmap, QFont, Qt
-from PySide6.QtCore import QMargins
-import resources_rc as rc
 from ImageAnalyzer import ImageAnalyzer, cv_image_to_qpixmap
 
 class FaceIdentificationScreen(QWidget):
     def __init__(self):
         super().__init__()
         self.display_area = DisplayArea()
-        self.setStyleSheet("background-color: green")
 
         self.modify_screen = ModifyScreen(self)
         self.panel = Panel(self)
@@ -30,11 +27,11 @@ class FaceIdentificationScreen(QWidget):
 class DisplayArea(QStackedWidget):
     def __init__(self):
         super().__init__()
+        self.setObjectName("DisplayArea")
         # TODO: Make the resource for the drag and drop.
         # TODO: Create the drag and drop functionality
         self.drag_and_drop_label = QLabel(pixmap=QPixmap(""))
         self.image_label = QLabel()
-        self.image_label.setStyleSheet("background-color: red")
 
         self.addWidget(self.drag_and_drop_label)
         self.addWidget(self.image_label)
@@ -128,6 +125,7 @@ class Panel(QScrollArea):
     def __init__(self, face_id: FaceIdentificationScreen):
         super().__init__()
         self.panel_content = QWidget()
+        self.panel_content.setObjectName("Panel")
         self.panel_content_layout = QVBoxLayout()
         self.panel_content_layout.addStretch()
         self.panel_content_layout.addWidget(self.bottom_bar())
@@ -159,6 +157,7 @@ class Panel(QScrollArea):
     def add_name_button(self, name= "Unknown"):
         button = QPushButton(name)
         button.clicked.connect(lambda: self.face_id.modify_screen.open(button))
+        button.setMinimumHeight(30)
         
         INSERT_INDEX = self.panel_content_layout.count() - 2
         self.panel_content_layout.insertWidget(INSERT_INDEX, button, alignment=Qt.AlignmentFlag.AlignTop)
@@ -166,7 +165,6 @@ class Panel(QScrollArea):
 class AddPictureScreen(QWidget):
     def __init__(self, face_id_screen: FaceIdentificationScreen):
         super().__init__()
-        self.setStyleSheet("background-color: blue")
         self.screen_layout = QVBoxLayout()
         self.setLayout(self.screen_layout)
         self.face_id_screen = face_id_screen
@@ -184,7 +182,7 @@ class AddPictureScreen(QWidget):
 
         self.screen_layout.addWidget(self.main_header, alignment= Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addWidget(self.image_path_text_box, alignment= Qt.AlignmentFlag.AlignHCenter)
-        self.screen_layout.addWidget(self.add_image_button, Qt.AlignmentFlag.AlignHCenter)
+        self.screen_layout.addWidget(self.add_image_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addStretch()
 
         self.face_id_screen.display_area.addWidget(self)
