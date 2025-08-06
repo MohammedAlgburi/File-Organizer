@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QStackedWidget, QScrollArea, QPushButton, QTextEdit, QSpacerItem
+from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QStackedWidget, QScrollArea, QPushButton, QTextEdit, QSpacerItem, QFileDialog, QMessageBox
 from PySide6.QtGui import QPixmap, QFont, Qt
 from ImageAnalyzer import ImageAnalyzer, cv_image_to_qpixmap
 
@@ -12,6 +12,9 @@ class FaceIdentificationScreen(QWidget):
         self.confirm_deletion_screen = ConfirmDeletionScreen(self)
         self.setting_screen = SettingScreen()
         self.add_picture_screen = AddPictureScreen(self)
+        self.options_screen = OptionsScreen(self)
+
+        self.display_area.setCurrentWidget(self.options_screen)
 
         self.setup_ui()
 
@@ -28,8 +31,6 @@ class DisplayArea(QStackedWidget):
     def __init__(self):
         super().__init__()
         self.setObjectName("DisplayArea")
-        # TODO: Make the resource for the drag and drop.
-        # TODO: Create the drag and drop functionality
         self.drag_and_drop_label = QLabel(pixmap=QPixmap(""))
         self.image_label = QLabel()
 
@@ -87,6 +88,7 @@ class ModifyScreen(QWidget):
         self.screen_layout = QVBoxLayout()
         self.setLayout(self.screen_layout)
         self.face_id.display_area.addWidget(self)
+        self.current_button = QPushButton()
 
         self.top_header = QLabel()
         self.top_header.setFont(QFont("Ariel", 44))
@@ -111,10 +113,11 @@ class ModifyScreen(QWidget):
         self.screen_layout.addWidget(self.delete_button, alignment= Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignBottom)
 
     def open(self, button: QPushButton):
+        self.current_button = button
         self.change_name_box.setText(button.text())
     
         self.top_header.setText(button.text())
-        self.delete_button.clicked.connect(lambda: self.face_id.confirm_deletion_screen.open(button))
+        self.delete_button.clicked.connect(lambda: self.face_id.confirm_deletion_screen.open(self.current_button))
 
         self.face_id.display_area.setCurrentWidget(self)
 
@@ -136,9 +139,10 @@ class Panel(QScrollArea):
         self.setWidgetResizable(True)
         self.setWidget(self.panel_content)
 
-        self.add_name_button("JOHN")
-        self.add_name_button("KLSDJF")
-        self.add_name_button("asfdafds")
+    def add_untitled_names(self, amount):
+        for _ in range(amount):
+            self.add_name_button()
+
 
     def bottom_bar(self) -> QWidget:
         bar = QWidget()
@@ -150,13 +154,18 @@ class Panel(QScrollArea):
         setting_button.setMaximumSize(20,20)
         setting_button.clicked.connect(lambda: self.face_id.display_area.setCurrentWidget(self.face_id.setting_screen))
 
+        help_button = QPushButton("H")
+        help_button.setMinimumSize(20,20)
+
+        bar_layout.addWidget(help_button, alignment=Qt.AlignmentFlag.AlignRight)
         bar_layout.addWidget(setting_button, Qt.AlignmentFlag.AlignRight)
 
         return bar
 
-    def add_name_button(self, name= "Unknown"):
+    def add_name_button(self, name= "Unnamed"):
         button = QPushButton(name)
         button.clicked.connect(lambda: self.face_id.modify_screen.open(button))
+        button.setProperty("type", "Standard_Button")
         button.setMinimumHeight(30)
         
         INSERT_INDEX = self.panel_content_layout.count() - 2
@@ -167,7 +176,7 @@ class AddPictureScreen(QWidget):
         super().__init__()
         self.screen_layout = QVBoxLayout()
         self.setLayout(self.screen_layout)
-        self.face_id_screen = face_id_screen
+        self.face_id = face_id_screen
 
         self.main_header = QLabel("Image Path")
         self.main_header.setFont(QFont("Ariel", 44))
@@ -175,18 +184,23 @@ class AddPictureScreen(QWidget):
         self.image_path_text_box = QTextEdit()
         self.image_path_text_box.setMaximumHeight(150)
 
+        self.back_button = QPushButton("Back to Menu")
+        self.back_button.clicked.connect(lambda: self.face_id.display_area.setCurrentWidget(self.face_id.options_screen))
+        self.back_button.setMinimumWidth(200)
 
         self.add_image_button = QPushButton("Add Picture")
-        self.add_image_button.setMaximumWidth(75)
+        self.add_image_button.setMinimumWidth(90)
         self.add_image_button.clicked.connect(self.add_image)
+        self.add_image_button.setProperty("type", "Standard_Button")
 
         self.screen_layout.addWidget(self.main_header, alignment= Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addWidget(self.image_path_text_box, alignment= Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addWidget(self.add_image_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addStretch()
+        self.screen_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        self.face_id_screen.display_area.addWidget(self)
-        self.face_id_screen.display_area.setCurrentWidget(self)
+        self.face_id.display_area.addWidget(self)
+        self.face_id.display_area.setCurrentWidget(self)
 
     def add_image(self):
         image_path = self.image_path_text_box.toPlainText()
@@ -198,5 +212,35 @@ class AddPictureScreen(QWidget):
 
         qpixmap = cv_image_to_qpixmap(image)
 
-        self.face_id_screen.display_area.set_image_label(qpixmap)
+        self.face_id.display_area.set_image_label(qpixmap)
 
+class OptionsScreen(QWidget):
+    def __init__(self, face_id_screen: FaceIdentificationScreen):
+        super().__init__()
+        self.face_id = face_id_screen
+        self.face_id.display_area.addWidget(self)
+
+        self.screen_layout = QVBoxLayout()
+        self.setLayout(self.screen_layout)
+
+        self.image_path = QPushButton("Image Path")
+        self.image_path.setFont(QFont("Ariel", 32))
+        self.screen_layout.addWidget(self.image_path, alignment=Qt.AlignmentFlag.AlignHCenter)
+        self.image_path.clicked.connect(self.add_picture_screen)
+
+        self.directory_button = QPushButton("Select Directory")
+        self.directory_button.setFont(QFont("Ariel", 32))
+        self.screen_layout.addWidget(self.directory_button, alignment=Qt.AlignmentFlag.AlignHCenter)
+        self.directory_button.clicked.connect(self.open_directory_dialog)
+        
+    def open_directory_dialog(self):
+        dialog = QFileDialog()
+        dir = dialog.getExistingDirectory(self, "Select a Directory", "")
+
+        if dir:
+            pass
+        else: 
+            message = QMessageBox(text="Chosen item is not a directory")
+
+    def add_picture_screen(self):
+        self.face_id.display_area.setCurrentWidget(self.face_id.add_picture_screen)
