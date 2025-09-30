@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/rc">
-        <file>Resources\Picture-Select-image.png</file>
-    </qresource>
-</RCC>
-
-<!-- python compile: pyside6-rcc resources.qrc -o resources_rc.py -->

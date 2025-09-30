@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QWidget, QHBoxLayout, QLabel, QVBoxLayout, QStackedWidget, QScrollArea, QPushButton, QTextEdit, QSpacerItem, QFileDialog, QMessageBox
-from PySide6.QtGui import QPixmap, QFont, Qt
+from PySide6.QtGui import QImage, QPixmap, QFont, QResizeEvent, Qt
 from ImageAnalyzer import ImageAnalyzer, cv_image_to_qpixmap
 
 class FaceIdentificationScreen(QWidget):
@@ -13,6 +13,8 @@ class FaceIdentificationScreen(QWidget):
         self.setting_screen = SettingScreen()
         self.add_picture_screen = AddPictureScreen(self)
         self.options_screen = OptionsScreen(self)
+
+        self.panel.hide()
 
         self.display_area.setCurrentWidget(self.options_screen)
 
@@ -32,7 +34,8 @@ class DisplayArea(QStackedWidget):
         super().__init__()
         self.setObjectName("DisplayArea")
         self.drag_and_drop_label = QLabel(pixmap=QPixmap(""))
-        self.image_label = QLabel()
+
+        self.image_label = ImageLabel(QPixmap())
 
         self.addWidget(self.drag_and_drop_label)
         self.addWidget(self.image_label)
@@ -127,8 +130,9 @@ class ModifyScreen(QWidget):
 class Panel(QScrollArea):
     def __init__(self, face_id: FaceIdentificationScreen):
         super().__init__()
+        self.setObjectName("Panel")
         self.panel_content = QWidget()
-        self.panel_content.setObjectName("Panel")
+        self.panel_content.setObjectName("PanelContent")
         self.panel_content_layout = QVBoxLayout()
         self.panel_content_layout.addStretch()
         self.panel_content_layout.addWidget(self.bottom_bar())
@@ -184,9 +188,9 @@ class AddPictureScreen(QWidget):
         self.image_path_text_box = QTextEdit()
         self.image_path_text_box.setMaximumHeight(150)
 
-        self.back_button = QPushButton("Back to Menu")
-        self.back_button.clicked.connect(lambda: self.face_id.display_area.setCurrentWidget(self.face_id.options_screen))
-        self.back_button.setMinimumWidth(200)
+        self.back_to_menu_button = QPushButton("Back to Menu")
+        self.back_to_menu_button.clicked.connect(self.back_to_menu)
+        self.back_to_menu_button.setMinimumWidth(200)
 
         self.add_image_button = QPushButton("Add Picture")
         self.add_image_button.setMinimumWidth(90)
@@ -194,10 +198,12 @@ class AddPictureScreen(QWidget):
         self.add_image_button.setProperty("type", "Standard_Button")
 
         self.screen_layout.addWidget(self.main_header, alignment= Qt.AlignmentFlag.AlignHCenter)
+        self.screen_layout.addSpacerItem(QSpacerItem(20, 10))
         self.screen_layout.addWidget(self.image_path_text_box, alignment= Qt.AlignmentFlag.AlignHCenter)
+        self.screen_layout.addSpacerItem(QSpacerItem(20, 10))
         self.screen_layout.addWidget(self.add_image_button, alignment=Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addStretch()
-        self.screen_layout.addWidget(self.back_button, alignment=Qt.AlignmentFlag.AlignHCenter)
+        self.screen_layout.addWidget(self.back_to_menu_button, alignment=Qt.AlignmentFlag.AlignHCenter)
 
         self.face_id.display_area.addWidget(self)
         self.face_id.display_area.setCurrentWidget(self)
@@ -212,7 +218,13 @@ class AddPictureScreen(QWidget):
 
         qpixmap = cv_image_to_qpixmap(image)
 
-        self.face_id.display_area.set_image_label(qpixmap)
+        scaled_pixmap = qpixmap.scaled(self.face_id.display_area.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+        self.face_id.display_area.set_image_label(scaled_pixmap)
+
+    def back_to_menu(self):
+        self.face_id.display_area.setCurrentWidget(self.face_id.options_screen)
+        self.face_id.panel.hide()
 
 class OptionsScreen(QWidget):
     def __init__(self, face_id_screen: FaceIdentificationScreen):
@@ -235,12 +247,26 @@ class OptionsScreen(QWidget):
         
     def open_directory_dialog(self):
         dialog = QFileDialog()
-        dir = dialog.getExistingDirectory(self, "Select a Directory", "")
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.exec()
 
-        if dir:
-            pass
-        else: 
-            message = QMessageBox(text="Chosen item is not a directory")
-
+        self.face_id.panel.show()
     def add_picture_screen(self):
         self.face_id.display_area.setCurrentWidget(self.face_id.add_picture_screen)
+        self.face_id.panel.show()
+
+class ImageLabel(QLabel):
+    def __init__(self, pixmap: QPixmap):
+        super().__init__()
+        self._pixmap = QPixmap(pixmap)
+        self.setAlignment(Qt.AlignmentFlag.AlignCenter)
+    
+    def resizeEvent(self, event: QResizeEvent) -> None:
+        if not self._pixmap.isNull():
+            label_size = self.size()
+
+            scaled_pixmap = self._pixmap.scaled(label_size, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+
+            self.setPixmap(scaled_pixmap)
+
+        super().resizeEvent(event)

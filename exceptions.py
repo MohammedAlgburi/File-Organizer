@@ -26,10 +26,6 @@ class FileManagerError(Exception):
     """General exception for the File manager class"""
     pass
 
-class NotDirectoryError(FileManagerError):
-    """Raised when a file path is not a directory."""
-    def __init__(self, message = "Inputted file path is not a directory") -> None:
-        super().__init__(message)
 
 
 

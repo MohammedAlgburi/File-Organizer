@@ -10,14 +10,18 @@ class App:
         self.main_window = MainWindow()
         self.main_window.show()
 
-        style_sheet = self.load_style_sheet("Styles.qss")
+        style_sheet = self.load_style_sheet(r"File-Organizer\Styles.qss")
         self.app.setStyleSheet(style_sheet)
 
         sys.exit(self.app.exec())
     
     def load_style_sheet(self, path):
-        with open(path) as file:
-            return file.read()
+        try:
+            with open(path) as file:
+                return file.read()
+        except:
+            print("An error has occured with opening of the CSS file")
+            sys.exit(1)
 
 class MainWindow(QMainWindow):
     def __init__(self):
