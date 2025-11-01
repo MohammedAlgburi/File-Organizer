@@ -26,6 +26,10 @@ class FileManagerError(Exception):
     """General exception for the File manager class"""
     pass
 
+class CSSLoadError(Exception):
+    """Raised when an error occurs while loading the QSS file"""
+    def __init__(self, message = "An error occured while loading the CSS file") -> None:
+        super().__init__(message)
 
 
 
