@@ -17,7 +17,8 @@ class ImageAnalyzer:
     def __init__(self) -> None:
         self.app = FaceAnalysis(name='buffalo_l', providers=['CPUExecutionProvider'])
         self.app.prepare(ctx_id=-1)
-
+    
+    # gets the face embedding of all of the faces inside of the image
     def get_faces(self, image_path: str) -> list:
         image = cv.imread(image_path)
 
@@ -31,10 +32,11 @@ class ImageAnalyzer:
 
         return faces
     
-    def compare_faces(self, emb1, emb2, threshold=.7) -> bool:
+    def check_same_face(self, emb1, emb2, threshold=.7) -> bool:
         similarity =  np.dot(emb1, emb2) / (np.linalg.norm(emb1) * np.linalg.norm(emb2))
         return similarity / threshold
     
+    # draws a rectangle around the head of the inputed face
     def draw_box_around_face(self, image_path: str, face: np.ndarray):
         image = cv.imread(image_path)
 

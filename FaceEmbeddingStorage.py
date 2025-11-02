@@ -4,19 +4,19 @@ from exceptions import CloseDBError, EmbeddingDBInitError, EmbeddingWriteError, 
 
 class FaceEmbeddingStorage:
     def __init__(self) -> None:
-        self.conn = sql.connect("face_encoding.db")
+        self.conn = sql.connect("face_embeddings.db")
 
         if self.check_table_exist() == False:
             self.initialize_db()
 
-    def add_encodings(self, embeddings: list[np.ndarray]) -> None:
-        """Adds a list of encodings into the database
+    def add_embeddings(self, embeddings: list[np.ndarray]) -> None:
+        """Adds a list of embeddings into the database
         
             Args:
                 embeddings (list): list of embedding which will be added to the database.
 
             Raises: 
-                EncodingWriteError: if there was an error from sqlite3 module.
+                EmbeddingWriteError: if there was an error from sqlite3 module.
         """
         for embedding in embeddings:
             if self.check_embedding(embedding):
@@ -33,10 +33,10 @@ class FaceEmbeddingStorage:
         """Initializes the table used for storing image embeddings.
         
             Raises:
-                EncodingDBInitError: if there was an sqlite3 error when initializing the database.
+                EmbeddingDBInitError: if there was an sqlite3 error when initializing the database.
         """
         try:
-            self.conn.execute("""CREATE TABLE IF NOT EXISTS encodings 
+            self.conn.execute("""CREATE TABLE IF NOT EXISTS embeddings 
                             (name TEXT,
                             embedding BLOB PRIMARY KEY)""")
             self.conn.commit()
@@ -71,7 +71,7 @@ class FaceEmbeddingStorage:
         return True
 
     def check_embedding(self, embedding: np.ndarray) -> bool:
-        """Checks if an encoding is in db.
+        """Checks if an embeddings is in db.
 
             Args:
                 embedding (np.ndarray): embedding which will be checked.
@@ -80,8 +80,12 @@ class FaceEmbeddingStorage:
                 bool: True if embedding is already in the db.
 
         """
+        if embedding is None:
+            raise TypeError("Embedding is None")
+        print(type(embedding))
+        print("MMMMMMMMMMMMMMMMMM")
         cursor = self.conn.cursor()
-        cursor.execute("SELECT embedding FROM embeddings WHERE embedding = ?", embedding.tobytes())
+        cursor.execute("SELECT embedding FROM embeddings WHERE embedding = ?", (embedding.tobytes(),))
         result = cursor.fetchone()
         if result:
             return True

@@ -14,7 +14,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.page_manager)
 
         self.face_embedding_storage = FaceEmbeddingStorage()
-        self.face_identification_screen = FaceIdentificationScreen()
+        self.face_identification_screen = FaceIdentificationScreen(self.face_embedding_storage)
 
         self.page_manager.addWidget(self.face_identification_screen)
         self.page_manager.setCurrentWidget(self.face_identification_screen)

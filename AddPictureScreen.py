@@ -10,6 +10,7 @@ class AddPictureScreen(QWidget):
         self.state_manager = state_manager
         self.display_area = self.state_manager.display_area
         self.panel = self.state_manager.panel
+        self.face_embedding_storage = self.state_manager.face_embedding_storage
 
         self.main_header = QLabel("Image Path")
         self.main_header.setFont(QFont("Ariel", 44))
@@ -43,6 +44,8 @@ class AddPictureScreen(QWidget):
         image_analyzer = ImageAnalyzer()
 
         faces = image_analyzer.get_faces(image_path)
+        faces_embeddings = [faces[i].embedding for i in range(len(faces))]
+        self.face_embedding_storage.add_embeddings(faces_embeddings)
         image = image_analyzer.draw_box_around_face(image_path, faces[0].bbox)
 
         qpixmap = cv_image_to_qpixmap(image)

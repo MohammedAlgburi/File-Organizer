@@ -5,12 +5,13 @@ from Panel import Panel
 from ModifyScreen import ModifyScreen
 from AddPictureScreen import AddPictureScreen
 from DisplayArea import DisplayArea
+from FaceEmbeddingStorage import FaceEmbeddingStorage
 
 class FaceIdentificationScreen(QWidget):
-
-    def __init__(self):
+    def __init__(self, face_embedding_storage: FaceEmbeddingStorage):
         super().__init__()
         main_layout = QHBoxLayout()
+        self.face_embedding_storage = face_embedding_storage
 
         self.current_button: QPushButton
         self.current_image: QPixmap
@@ -26,6 +27,8 @@ class FaceIdentificationScreen(QWidget):
         main_layout.addWidget(self.display_area)        
 
         self.setLayout(main_layout)
+
+    
     
     def load_setting_screen(self):
         SettingScreen()
