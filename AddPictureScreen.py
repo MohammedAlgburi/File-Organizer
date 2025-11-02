@@ -27,6 +27,7 @@ class AddPictureScreen(QWidget):
         self.add_image_button.clicked.connect(self.add_image)
         self.add_image_button.setProperty("type", "Standard_Button")
 
+        self.screen_layout.addSpacerItem(QSpacerItem(10, 40))
         self.screen_layout.addWidget(self.main_header, alignment= Qt.AlignmentFlag.AlignHCenter)
         self.screen_layout.addSpacerItem(QSpacerItem(20, 10))
         self.screen_layout.addWidget(self.image_path_text_box, alignment= Qt.AlignmentFlag.AlignHCenter)

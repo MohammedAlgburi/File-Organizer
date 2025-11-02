@@ -1,15 +1,21 @@
 from PySide6.QtWidgets import QScrollArea, QWidget, QVBoxLayout, QHBoxLayout, QPushButton
-from PySide6.QtGui import Qt
+from PySide6.QtGui import Qt, QFont
 
 class Panel(QScrollArea):
     def __init__(self, state_manager):
         super().__init__()
         self.state_manager = state_manager
         self.modify_screen = self.state_manager.modify_screen
+        self.display_area = self.state_manager.display_area
         self.setObjectName("Panel")
         self.panel_content = QWidget()
         self.panel_content.setObjectName("PanelContent")
         self.panel_content_layout = QVBoxLayout()
+
+        self.add_image_button = Button("+")
+        self.add_image_button.setFont(QFont("Arial", 18))
+        self.add_image_button.clicked.connect(lambda: (self.display_area.setCurrentWidget(self.state_manager.options_screen), self.hide(), None)[-1])
+        self.panel_content_layout.addWidget(self.add_image_button)
 
         self.setting_button = QPushButton("S")
         self.setting_button.setMaximumSize(20,20)

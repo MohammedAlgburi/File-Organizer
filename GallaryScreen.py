@@ -1,38 +1,45 @@
 from PySide6.QtWidgets import QWidget, QStackedWidget, QLabel, QVBoxLayout, QPushButton
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, Qt
+
 
 class GallaryScreen(QWidget):
-    def __init__(self):
+    def __init__(self, state_manager):
         super().__init__()
+        self.state_manager = state_manager
+        self.display_area = self.state_manager.display_area
 
-        self.screen_manager = QStackedWidget(self)
-        self.screen_manager.addWidget(_NoImagesScreen())
-        self.screen_manager.addWidget(_PicturesScreen())
+        self.image_select_screen = ImageSelectScreen(self.state_manager)
+        self.image_view = ImageView()
 
-    
+        self.display_area.addWidget(self.image_select_screen)
+        self.display_area.addWidget(self.image_view)
+
+
 # Contains all of the functionality
-class _NoImagesScreen(QWidget):
-    def __init__(self):
-        #TODO
-        TITLE_FONT = QFont()
+class ImageSelectScreen(QWidget):
+    def __init__(self, state_manager):
+        TITLE_FONT = QFont("Arial", 28)
         super().__init__()
+        self.state_manager = state_manager
+        self.display_area = state_manager.display_area
         self.screen_layout = QVBoxLayout()
+        self.setLayout(self.screen_layout)
+        self.screen_layout.addStretch()
+        self.setObjectName("NoBackgroundButton")
 
-        self.title_message = QLabel("Add Images To Gallary")
+        self.title_message = QPushButton("Galary view")
         self.title_message.setFont(TITLE_FONT)
 
         self.select_image = QPushButton("Add Image")
-
-        self.select_dir = QPushButton("Add a Folder")
-
-        self.screen_layout.addWidget(self.title_message)
-        self.screen_layout.addWidget(self.select_image)
-        self.screen_layout.addWidget(self.select_dir)
+        self.select_image.setFont(TITLE_FONT)
+        self.select_image.clicked.connect(lambda: self.display_area.setCurrentWidget(self.state_manager.options_screen))
 
 
-    
+        self.screen_layout.addWidget(self.title_message, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.screen_layout.addWidget(self.select_image, alignment=Qt.AlignmentFlag.AlignCenter)
+        self.screen_layout.addStretch()
 
-class _PicturesScreen(QWidget):
+class ImageView(QWidget):
     def __init__(self):
         super().__init__()
     

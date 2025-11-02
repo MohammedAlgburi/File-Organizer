@@ -6,6 +6,7 @@ class OptionsScreen(QWidget):
     def __init__(self, state_manager):
         super().__init__()
         self.BUTTON_FONT = QFont("Ariel", 32)
+        self.setObjectName("NoBackgroundButton")
         self.state_manager = state_manager
         self.display_area = self.state_manager.display_area
         self.panel = self.state_manager.panel

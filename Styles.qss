@@ -16,8 +16,13 @@ QPushButton:Hover {
     padding: 5px;
 }
 
-#face {
+#NoBackgroundButton QPushButton {
     background-color: #0C1821;
+}
+
+#NoBackgroundButton QPushButton:Hover {
+    background-color: #0C1821;
+    color: #f0eff8;
 }
 
 #Panel {

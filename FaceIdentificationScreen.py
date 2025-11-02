@@ -6,6 +6,7 @@ from ModifyScreen import ModifyScreen
 from AddPictureScreen import AddPictureScreen
 from DisplayArea import DisplayArea
 from FaceEmbeddingStorage import FaceEmbeddingStorage
+from GallaryScreen import GallaryScreen
 
 class FaceIdentificationScreen(QWidget):
     def __init__(self, face_embedding_storage: FaceEmbeddingStorage):
@@ -15,13 +16,16 @@ class FaceIdentificationScreen(QWidget):
 
         self.current_button: QPushButton
         self.current_image: QPixmap
-        self.display_area = DisplayArea(self)
-        self.modify_screen = ModifyScreen(self)
-        self.panel = Panel(self)
-        self.options_screen = OptionsScreen(self)
-        self.add_picture_screen = AddPictureScreen(self)
+        self.display_area: DisplayArea = DisplayArea(self)
+        self.modify_screen: ModifyScreen = ModifyScreen(self)
+        self.panel: Panel = Panel(self)
+        self.options_screen: OptionsScreen = OptionsScreen(self)
+        self.add_picture_screen: AddPictureScreen = AddPictureScreen(self)
+        self.gallary_screen: GallaryScreen = GallaryScreen(self)
 
-        self.display_area.setCurrentWidget(self.options_screen)
+        # Startup Screen 
+        # TODO Make this screen the gallary screen after that screen is done
+        self.display_area.setCurrentWidget(self.gallary_screen.image_select_screen)
 
         main_layout.addWidget(self.panel)
         main_layout.addWidget(self.display_area)        

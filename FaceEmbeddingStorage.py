@@ -82,8 +82,6 @@ class FaceEmbeddingStorage:
         """
         if embedding is None:
             raise TypeError("Embedding is None")
-        print(type(embedding))
-        print("MMMMMMMMMMMMMMMMMM")
         cursor = self.conn.cursor()
         cursor.execute("SELECT embedding FROM embeddings WHERE embedding = ?", (embedding.tobytes(),))
         result = cursor.fetchone()
