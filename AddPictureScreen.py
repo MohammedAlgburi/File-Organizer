@@ -58,5 +58,5 @@ class AddPictureScreen(QWidget):
         self.panel.add_untitled_names(len(faces))
 
     def back_to_menu(self):
-        self.display_area.setCurrentWidget(self.state_manager.options_screen)
+        self.display_area.setCurrentWidget(self.state_manager.gallary_screen.image_select_screen)
         self.panel.hide()
